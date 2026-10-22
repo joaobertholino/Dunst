@@ -1,0 +1,51 @@
+# Notificações no tema preto e cinza do Hyprland / Waybar.
+[global]
+    origin = top-right
+    offset = (10, 32)
+    # Noto Sans é a fonte efetiva da Waybar quando Wigrum não está instalada.
+    font = Noto Sans 11
+    width = 360
+    height = (0, 240)
+    gap_size = 8
+    transparency = 0
+    alignment = left
+    vertical_alignment = top
+    ellipsize = end
+    markup = full
+    frame_width = 1
+    frame_color = "#262626"
+    separator_color = "#262626"
+    corner_radius = 0
+    background = "#000000"
+    foreground = "#F5F5F5"
+    padding = 12
+    horizontal_padding = 16
+    text_icon_padding = 12
+    icon_position = left
+    min_icon_size = 24
+    max_icon_size = 24
+    icon_theme = "bloom-dark, Adwaita"
+    enable_posix_regex = true
+    format = "<span foreground='#a3a3a3' size='small'>%a</span>\n<b>%s</b>\n%b"
+    progress_bar_height = 6
+    progress_bar_frame_width = 1
+    progress_bar_corner_radius = 0
+
+[urgency_low]
+    background = "#000000"
+    foreground = "#A3A3A3"
+    frame_color = "#262626"
+
+[urgency_normal]
+    background = "#000000"
+    foreground = "#F5F5F5"
+    frame_color = "#262626"
+
+[urgency_critical]
+    background = "#000000"
+    foreground = "#F87171"
+    frame_color = "#F87171"
+
+[browser_notification]
+    appname = ".*(Google Chrome|Chromium|Firefox|Brave|Vivaldi|Opera|Microsoft Edge|[Zz]en).*"
+    format = "<span foreground='#a3a3a3' size='small'>%a</span>\n<b>%s</b>\n%b"
