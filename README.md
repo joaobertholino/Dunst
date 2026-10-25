@@ -1,27 +1,51 @@
-# Dunst — notificações do Hyprland
+# Dunst — notificações do Gentoo com Hyprland
 
-Configuração pessoal de notificações para Arch Linux com Hyprland, mantida como submódulo de `joaobertholino/dotfiles` em `.config/dunst`.
+Tema pessoal de notificações, mantido como submódulo de [dotfiles](https://github.com/joaobertholino/dotfiles) em `~/.config/dunst`. Conferido em **25/10/2026**.
 
-## Aparência
+O repositório fornece `dunstrc`; o Dunst e o comando `notify-send` são instalados separadamente. A máquina atual usa o Dunst pré-compilado da pilha Nix e o serviço de usuário `dunst.service`.
+
+## Aparência e posicionamento
 
 - Fundo preto `#000000`, texto claro `#F5F5F5` e borda cinza `#262626` de 1 px.
 - Cantos retos e fonte Noto Sans 11.
-- Nome do aplicativo em cinza, ícones de 24 px e espaçamento interno ampliado.
-- Alertas críticos em vermelho `#F87171`.
+- Posição superior direita, deslocamento `(10, 32)` e largura de 360 px.
+- Espaço de 8 px entre notificações; preenchimento vertical de 12 px e horizontal de 16 px.
+- Nome do aplicativo em cinza, título em negrito, ícones de 24 px e texto alinhado à esquerda.
+- Urgência baixa em cinza; alertas críticos com texto e borda vermelhos `#F87171`.
+- Regra específica de formatação para navegadores, incluindo Zen, Firefox e Chromium.
 
-## Aplicar alterações
+Os ícones procuram `bloom-dark` e depois `Adwaita`. Instale os temas e a fonte ou adapte essas opções ao seu sistema.
 
-O Hyprland inicia o Dunst em sua configuração de inicialização. Com o serviço em execução:
+## Instalação e aplicação
+
+No clone do repositório principal:
 
 ```sh
-dunstctl reload
-notify-send --app-name=Sistema "Notificação de teste" "Tema preto e cinza do sistema."
+git submodule update --init --recursive .config/dunst
 ```
 
-A configuração usa o tema de ícones `bloom-dark`, com `Adwaita` como alternativa. Instale a fonte Noto Sans ou ajuste a opção `font` para uma fonte disponível.
+Para instalação independente, faça backup da configuração existente e clone em um destino vazio:
 
-## Versionamento
+```sh
+git clone git@github.com:joaobertholino/Dunst.git "$HOME/.config/dunst"
+```
 
-O arquivo `dunstrc` é a configuração ativa. Backups e arquivos temporários permanecem locais e são ignorados pelo Git.
+O módulo de inicialização do Hyprland chama o helper local `/usr/local/bin/gentoo-session-start`, que inicia `dunst.service`. O helper e a instalação binária ficam fora deste repositório.
 
-Ao alterar esta configuração, publique primeiro o commit deste repositório e depois atualize a referência do submódulo no repositório `dotfiles`.
+Para aplicar alterações e testar, dentro da sessão gráfica:
+
+```sh
+systemctl --user status dunst.service
+dunstctl reload
+notify-send --app-name=Sistema 'Notificação de teste' 'Tema preto e cinza do sistema.'
+```
+
+Em uma instalação sem a unidade systemd local, o daemon pode ser iniciado diretamente com `dunst -conf "$HOME/.config/dunst/dunstrc"`. Mantenha apenas um daemon responsável pelas notificações da sessão.
+
+## Versionamento e recuperação
+
+`dunstrc` é a configuração ativa. O `.gitignore` mantém backups e arquivos temporários fora do Git.
+
+A cópia local utiliza `main` e o remoto `personal`. O `~/.local/bin/auto-push.sh` do repositório principal salva e envia este submódulo antes de atualizar o gitlink no pai; o timer do usuário executa a cada hora. Não há timer adicional neste submódulo.
+
+Para manutenção manual, confira `git status`/`git diff`, publique o commit deste repositório e depois atualize sua referência em `dotfiles`. Para recuperação, restaure uma versão conhecida de `dunstrc` e execute `dunstctl reload`.
