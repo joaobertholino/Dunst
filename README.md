@@ -1,6 +1,6 @@
 # Dunst — notificações do Gentoo com Hyprland
 
-Tema pessoal de notificações, mantido como submódulo de [dotfiles](https://github.com/joaobertholino/dotfiles) em `~/.config/dunst`. Conferido em **25/10/2026**.
+Tema pessoal de notificações, mantido como submódulo de [dotfiles](https://github.com/joaobertholino/dotfiles) em `~/.config/dunst`. Integração com a sessão atualizada em **26/10/2026**.
 
 O repositório fornece `dunstrc`; o Dunst e o comando `notify-send` são instalados separadamente. A máquina atual usa o Dunst pré-compilado da pilha Nix e o serviço de usuário `dunst.service`.
 
@@ -30,17 +30,20 @@ Para instalação independente, faça backup da configuração existente e clone
 git clone git@github.com:joaobertholino/Dunst.git "$HOME/.config/dunst"
 ```
 
-O módulo de inicialização do Hyprland chama o helper local `/usr/local/bin/gentoo-session-start`, que inicia `dunst.service`. O helper e a instalação binária ficam fora deste repositório.
+No Gentoo atual, `dunst.service` está habilitado em `hyprland-session.target`. O hook Lua do Hyprland chama `/usr/local/bin/gentoo-session-start`, que importa o ambiente gráfico e ativa esse target; o systemd inicia o Dunst. O serviço acompanha a sessão por um drop-in `~/.config/systemd/user/dunst.service.d/session.conf`, com vínculo também a `graphical-session.target`.
+
+A unidade base está em `/etc/systemd/user/dunst.service`, usa `Type=dbus` e o nome `org.freedesktop.Notifications`, e executa `/opt/hyprland/bin/dunst -conf /home/joaob/.config/dunst/dunstrc`. O monitor do compositor encerra o target e seus serviços ao terminar o Hyprland. O helper, a unidade, o drop-in e o monitor são componentes locais externos a este submódulo; clonar apenas o tema não os instala. Consulte a [integração de sessão no dotfiles](https://github.com/joaobertholino/dotfiles#sessão-notificações-e-calendário).
 
 Para aplicar alterações e testar, dentro da sessão gráfica:
 
 ```sh
 systemctl --user status dunst.service
+journalctl --user -u dunst.service -b
 dunstctl reload
 notify-send --app-name=Sistema 'Notificação de teste' 'Tema preto e cinza do sistema.'
 ```
 
-Em uma instalação sem a unidade systemd local, o daemon pode ser iniciado diretamente com `dunst -conf "$HOME/.config/dunst/dunstrc"`. Mantenha apenas um daemon responsável pelas notificações da sessão.
+Em uma instalação sem a unidade systemd local, o daemon pode ser iniciado diretamente com `dunst -conf "$HOME/.config/dunst/dunstrc"`. Mantenha apenas um daemon responsável pelas notificações da sessão. Com a unidade local ativa, não acrescente outro `dunst` ao autostart do Hyprland. A integração atual foi verificada com uma única instância, encerramento pelo target e restauração ao reativá-lo.
 
 ## Versionamento e recuperação
 
